@@ -1,0 +1,75 @@
+---
+title: "PML Course Project- Leonard"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setup
+I'll load the tidyverse and caret packages to make it easier top work with the sample data, and read that data in.
+
+```{r prepare}
+library(tidyverse)
+library(caret)
+
+train_data <- read_csv("pml-training.csv")
+```
+
+## Explore data
+What does the data look like? I plan to use a random forest for this prediction, so I'll need to remove any columns that contain "NA" values.
+
+
+```{r explore}
+
+glimpse(train_data)
+```
+
+Oh no! so many NA columns. I'm going to use the "tidyimpute" package to make it easy to remove those columns. This code will take the training data and remove any columns with "na" values. I then remove by hand columns that contain character values or things that obviously wont help prediction, like "user_name"
+
+```{r clean}
+library(tidyimpute)
+train_data %>% 
+  drop_cols_any_na() %>%
+  select(-X1,
+         -user_name,
+         -raw_timestamp_part_1,
+         -raw_timestamp_part_2,
+         -cvtd_timestamp,
+         -new_window)-> clean_data
+
+```
+
+## Train a model
+Using the "clean_data" I will extract the predictors and fit a random forest using the caret package. I use a pca preprocess, but don't do cross-fold validation because it would take too long to train the model.
+
+```{r train, cache=TRUE}
+predictors <- clean_data %>% select(-classe)
+predicted <- clean_data %>% select(classe)
+
+rf_model <- train(data.frame(predictors), predicted$classe, method = "rf", preProcess = "pca")
+rf_model
+```
+
+## Evaluate the model
+The model looks good.
+
+## Predict the test set
+Now I use the rf_model to predict on the test set. I will read in and process the test data identically to the train data.
+
+```{r predict}
+test_data <- read_csv("pml-testing.csv")
+test_data %>% 
+  drop_cols_any_na() %>%
+  select(-X1,
+         -user_name,
+         -raw_timestamp_part_1,
+         -raw_timestamp_part_2,
+         -cvtd_timestamp,
+         -new_window)-> clean_test
+
+predict(rf_model, newdata = clean_test)
+```
+
+I hope I pass the quiz!
