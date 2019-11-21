@@ -619,131 +619,33 @@ train_data %&gt;%
 </div>
 <div id="train-a-model" class="section level2">
 <h2>Train a model</h2>
-<p>Using the “clean_data” I will extract the predictors and fit a random forest using the caret package. I use a pca preprocess, but don’t do cross-fold validation because it would take too long to train the model.</p>
+<p>Using the “clean_data” I will extract the predictors and fit a random forest using the caret package. I use a pca preprocess, and use repeated cross-validation to minimize out of sample error. I do some multiprocessing to speed things up.</p>
 <pre class="r"><code>predictors &lt;- clean_data %&gt;% select(-classe)
 predicted &lt;- clean_data %&gt;% select(classe)
 
-rf_model &lt;- train(data.frame(predictors), predicted$classe, method = &quot;rf&quot;, preProcess = &quot;pca&quot;)</code></pre>
-<pre><code>## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
+#train control parameters
+ctrl &lt;- trainControl(method = &quot;repeatedcv&quot;,
+                     repeats = 5,
+                     number = 10)
+#and use parallel processng to speed things up
+library(doParallel)</code></pre>
+<pre><code>## Loading required package: foreach</code></pre>
+<pre><code>## 
+## Attaching package: 'foreach'</code></pre>
+<pre><code>## The following objects are masked from 'package:purrr':
+## 
+##     accumulate, when</code></pre>
+<pre><code>## Loading required package: iterators</code></pre>
+<pre><code>## Loading required package: parallel</code></pre>
+<pre class="r"><code>cl &lt;- makePSOCKcluster(5)
+registerDoParallel(cl)
 
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range
-
-## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid
-## mtry: reset to within valid range</code></pre>
-<pre class="r"><code>rf_model</code></pre>
+rf_model &lt;- train(data.frame(predictors), 
+                  predicted$classe, 
+                  method = &quot;rf&quot;, 
+                  preProcess = &quot;pca&quot;,
+                  trControl = ctrl)
+rf_model</code></pre>
 <pre><code>## Random Forest 
 ## 
 ## 19622 samples
@@ -752,14 +654,14 @@ rf_model &lt;- train(data.frame(predictors), predicted$classe, method = &quot;rf
 ## 
 ## Pre-processing: principal component signal extraction (53), centered
 ##  (53), scaled (53) 
-## Resampling: Bootstrapped (25 reps) 
-## Summary of sample sizes: 19622, 19622, 19622, 19622, 19622, 19622, ... 
+## Resampling: Cross-Validated (10 fold, repeated 5 times) 
+## Summary of sample sizes: 17660, 17659, 17661, 17659, 17660, 17659, ... 
 ## Resampling results across tuning parameters:
 ## 
 ##   mtry  Accuracy   Kappa    
-##    2    0.9769823  0.9708823
-##   27    0.9638742  0.9543018
-##   53    0.9638899  0.9543219
+##    2    0.9837632  0.9794601
+##   27    0.9766489  0.9704605
+##   53    0.9765775  0.9703709
 ## 
 ## Accuracy was used to select the optimal model using the largest value.
 ## The final value used for the model was mtry = 2.</code></pre>
@@ -811,6 +713,31 @@ rf_model &lt;- train(data.frame(predictors), predicted$classe, method = &quot;rf
 predict(rf_model, newdata = clean_test)</code></pre>
 <pre><code>##  [1] B A B A A E D B A A B C B A E E A B B B
 ## Levels: A B C D E</code></pre>
+</div>
+<div id="how-did-we-do" class="section level2">
+<h2>How did we do?</h2>
+<pre class="r"><code>#inspect the model
+rf_model</code></pre>
+<pre><code>## Random Forest 
+## 
+## 19622 samples
+##    53 predictor
+##     5 classes: 'A', 'B', 'C', 'D', 'E' 
+## 
+## Pre-processing: principal component signal extraction (53), centered
+##  (53), scaled (53) 
+## Resampling: Cross-Validated (10 fold, repeated 5 times) 
+## Summary of sample sizes: 17660, 17659, 17661, 17659, 17660, 17659, ... 
+## Resampling results across tuning parameters:
+## 
+##   mtry  Accuracy   Kappa    
+##    2    0.9837632  0.9794601
+##   27    0.9766489  0.9704605
+##   53    0.9765775  0.9703709
+## 
+## Accuracy was used to select the optimal model using the largest value.
+## The final value used for the model was mtry = 2.</code></pre>
+<p>Based on Accuracy reported, the model <code>mtry=2</code> performs best. The high accuracy on this data (~0.983) bodes well for the model, but may be an underestimate compared to test data. The real proof is in the test_data pudding…</p>
 <p>I hope I pass the quiz!</p>
 </div>
 

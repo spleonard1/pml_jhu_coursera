@@ -42,13 +42,26 @@ train_data %>%
 ```
 
 ## Train a model
-Using the "clean_data" I will extract the predictors and fit a random forest using the caret package. I use a pca preprocess, but don't do cross-fold validation because it would take too long to train the model.
+Using the "clean_data" I will extract the predictors and fit a random forest using the caret package. I use a pca preprocess, and use repeated cross-validation to minimize out of sample error. I do some multiprocessing to speed things up. 
 
 ```{r train, cache=TRUE}
 predictors <- clean_data %>% select(-classe)
 predicted <- clean_data %>% select(classe)
 
-rf_model <- train(data.frame(predictors), predicted$classe, method = "rf", preProcess = "pca")
+#train control parameters
+ctrl <- trainControl(method = "repeatedcv",
+                     repeats = 5,
+                     number = 10)
+#and use parallel processng to speed things up
+library(doParallel)
+cl <- makePSOCKcluster(5)
+registerDoParallel(cl)
+
+rf_model <- train(data.frame(predictors), 
+                  predicted$classe, 
+                  method = "rf", 
+                  preProcess = "pca",
+                  trControl = ctrl)
 rf_model
 ```
 
@@ -71,5 +84,14 @@ test_data %>%
 
 predict(rf_model, newdata = clean_test)
 ```
+
+## How did we do?
+
+```{r}
+#inspect the model
+rf_model
+
+```
+Based on Accuracy reported, the model `mtry=2` performs best. The high accuracy on this data (~0.983) bodes well for the model, but may be an underestimate compared to test data. The real proof is in the test_data pudding...
 
 I hope I pass the quiz!
